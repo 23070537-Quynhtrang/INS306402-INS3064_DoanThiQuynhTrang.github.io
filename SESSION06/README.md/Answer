@@ -1,0 +1,102 @@
+# Normalization Challenge
+
+## Part 1: Identify Violations
+
+### 1. Columns that lead to redundancy
+The following columns create redundant data because their values repeat across multiple rows:
+
+- **StudentName** – A student may enroll in multiple courses, so the student name appears many times.
+- **CourseName** – A course can be taken by many students, so the course name is repeated.
+- **ProfessorName** – The same professor may teach multiple students in the same course.
+- **ProfessorEmail** – The professor’s email repeats for every student enrolled in that professor’s course.
+
+This redundancy increases storage usage and makes data maintenance more difficult.
+
+---
+
+### 2. Possible update anomalies
+
+Because all information is stored in one table, several update anomalies may occur:
+
+**Student update anomaly**
+
+If a student changes their name, it must be updated in multiple rows.
+
+Example:
+Student **Nguyen An** appears in multiple course records.
+
+If the name changes, every row must be updated. Missing one row creates inconsistent data.
+
+---
+
+**Course update anomaly**
+
+If a course name changes, all records containing that course must be updated.
+
+Example:
+```
+CourseID 101 → Database Systems
+```
+
+If the course is renamed to **Advanced Database Systems**, every record with CourseID 101 must be updated.
+
+---
+
+**Professor update anomaly**
+
+If a professor changes their email address, it must be updated in every record.
+
+Example:
+
+```
+Dr. Le → le@uni.edu
+```
+
+If the email changes, all rows referencing **Dr. Le** must be updated.
+
+---
+
+### 3. Transitive dependency
+
+There is a transitive dependency in the table.
+
+Functional dependencies:
+
+```
+StudentID → StudentName
+CourseID → CourseName
+CourseID → ProfessorName
+ProfessorName → ProfessorEmail
+```
+
+This creates a **transitive dependency**:
+
+```
+CourseID → ProfessorName → ProfessorEmail
+```
+
+This violates **Third Normal Form (3NF)** because a non-key attribute depends on another non-key attribute.
+
+---
+
+## Part 1: Normalization (3NF Schema)
+
+| Table Name | Primary Key | Foreign Key | Normal Form | Description |
+|-------------|-------------|-------------|-------------|-------------|
+| Students | student_id | None | 3NF | Stores student information |
+| Professors | professor_id | None | 3NF | Stores professor information |
+| Courses | course_id | professor_id | 3NF | Stores course information and the professor who teaches the course |
+| Enrollments | enrollment_id | student_id, course_id | 3NF | Stores which students enroll in which courses and their grades |
+
+---
+
+## Part 2: Relationships
+
+**Students to Enrollments:** One-to-Many (1:N)  
+One student can enroll in multiple courses.
+
+**Courses to Enrollments:** One-to-Many (1:N)  
+One course can have many students enrolled.
+
+**Professors to Courses:** One-to-Many (1:N)  
+One professor can teach multiple courses.
